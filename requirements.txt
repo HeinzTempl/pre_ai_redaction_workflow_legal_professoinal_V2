@@ -1,0 +1,8 @@
+python-docx
+spacy
+pymupdf
+openai
+regex
+unoconv
+reportlab
+extract-msg
