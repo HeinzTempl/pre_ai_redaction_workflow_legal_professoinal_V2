@@ -27,8 +27,8 @@ Additionally, the solution provides an option to convert DOCX and MSG files to P
 1. **Clone the Repository**  
    Open your terminal or command prompt and run:
    ```bash
-   git clone https://github.com/yourusername/your-repository-name.git
-   cd your-repository-name
+   [git clone https://github.com/yourusername/your-repository-name.git
+   cd your-repository-name](https://github.com/HeinzTempl/pre_ai_redaction_workflow_legal_professoinal_V2.git)
 python -m venv venv
 source venv/bin/activate      # On Windows: venv\Scripts\activate
 
@@ -38,17 +38,24 @@ source venv/bin/activate      # On Windows: venv\Scripts\activate
 
 3.	Install Dependencies
 Run the following commands in your terminal:
+pip install the following packages
 
 pip install python-docx
-pip install pymupdf
 pip install spacy
-python -m spacy download de_core_news_sm
-pip install docx2pdf
-pip install extract_msg
-pip install reportlab
+pip install pymupdf
 pip install openai
+pip install regex
+pip install unoconv
+pip install reportlab
+pip install extract-msg
 
-4. 	Usage
+Install the SpaCy libraries for German
+SpaCy Lib:
+
+python -m spacy download de_core_news_sm
+
+
+5. 	Usage
 	1.	Configure Your Environment
 	•	Ensure that Microsoft Word (or an Office suite) is installed on your system if you plan to convert DOCX files to PDF.
 	•	If you use the API-based redaction option, make sure you have set your OpenAI API key (either by setting the OPENAI_API_KEY environment variable or directly in the code).
