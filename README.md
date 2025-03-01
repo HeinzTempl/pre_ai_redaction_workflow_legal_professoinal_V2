@@ -46,7 +46,7 @@ source venv/bin/activate      # On Windows: venv\Scripts\activate
 Some dependencies (such as urllib3) require an updated version of OpenSSL. If you encounter warnings or errors related to OpenSSL when running the script, follow these steps.
 
 🖥️ macOS (Homebrew)
-	1.	Ensure Homebrew is installed (if not, install it first):
+	1.	Ensure Homebrew is installed (if not, install it first for installation refere to this site: https://brew.sh):
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -84,6 +84,7 @@ After these steps, your script should run without SSL issues. 🚀
 Your previously uploaded README.md file has expired. Please re-upload it if you want me to modify it directly.
 
 🛠 LibreOffice Dependency for DOCX to PDF Conversion
+## The script can be adapted to use MS Word as a converter - libreoffice is free so you can use it anyway ##
 
 To convert .docx files to .pdf, this project uses LibreOffice in headless mode. Ensure it is installed and correctly configured on your system.
 
