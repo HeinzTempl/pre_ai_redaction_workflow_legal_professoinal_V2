@@ -1,6 +1,6 @@
 # DSGVO/GDPR-Compliant Pre-AI Document Redaction Workflow V2
 
-# changelog for this Version 2: Better Open AI-API Integration, doc and docx files can be processed, doc and docx file redaction now inclueds tables, page header and footers. #
+## changelog for this Version 2: Better Open AI-API Integration, doc and docx files can be processed, doc and docx file redaction now inclueds tables, page header and footers. ##
 
 This project provides a pre-processing workflow for legal documents that ensures sensitive data is anonymized before being processed by a Language Model (LLM). Designed with the needs of lawyers, prosecutors, notaries, and legal departments in mind, the solution helps you maintain GDPR compliance by ensuring that only anonymized data is sent to external LLM providers.
 
@@ -138,4 +138,4 @@ License
 
 Contact
 
-For any questions or feedback, please contact [Your Name] at [heinz@templ.com].
+For any questions or feedback, please contact Heinz Templ, Attorney at law, at [heinz@templ.com].
