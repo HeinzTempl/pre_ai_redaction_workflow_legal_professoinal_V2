@@ -39,7 +39,7 @@ Additionally, the solution provides an option to convert DOCX and MSG files to P
 python -m venv venv
 source venv/bin/activate      # On Windows: venv\Scripts\activate
 
-### Important Dependences ###
+## !!! Important Dependences - Windows and Mac OS !!! ##
 
 🔧 OpenSSL, Python, and Homebrew: Important Dependencies
 
