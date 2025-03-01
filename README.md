@@ -13,6 +13,7 @@ The workflow processes various document formats (DOCX, PDF, MSG) using a two-ste
 Additionally, the solution provides an option to convert DOCX and MSG files to PDF for better processing accuracy. For cases where API-based redaction is required, an OpenAI API integration is available (with a GDPR-compliant data processing addendum).
 
 ## Getting Started
+### if you're getting some errors during installation or running the script - just copy/paste the error into ChatGPT and it can resolve most issues for you ###
 
 ### Prerequisites
 
