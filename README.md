@@ -81,8 +81,68 @@ python -m pip install --upgrade pip
 
 After these steps, your script should run without SSL issues. 🚀
 
-📌 If you want me to directly update your README.md, please re-upload the file!
-Otherwise, copy & paste this section into your existing file and push it to GitHub. 😊
+Your previously uploaded README.md file has expired. Please re-upload it if you want me to modify it directly.
+
+🛠 LibreOffice Dependency for DOCX to PDF Conversion
+
+To convert .docx files to .pdf, this project uses LibreOffice in headless mode. Ensure it is installed and correctly configured on your system.
+
+🖥️ macOS Installation
+	1.	Check if LibreOffice is installed:
+Run the following command in the terminal:
+
+which soffice
+
+If nothing is returned, LibreOffice is missing.
+
+	2.	Install LibreOffice via Homebrew:
+
+brew install --cask libreoffice
+
+
+	3.	Verify installation:
+
+/Applications/LibreOffice.app/Contents/MacOS/soffice --version
+
+If it works, update the script to explicitly use this path.
+
+	4.	Modify file_converter.py if needed:
+Locate this line:
+
+libreoffice_path = "soffice"
+
+Change it to:
+
+libreoffice_path = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+
+🖥️ Windows Installation
+	1.	Check if LibreOffice is installed:
+Open cmd and run:
+
+where soffice
+
+If nothing appears, LibreOffice is missing.
+
+	2.	Download and install LibreOffice from the official website.
+	3.	Find the soffice.exe path:
+Default location:
+
+C:\Program Files\LibreOffice\program\soffice.exe
+
+Run the following command in cmd to verify:
+
+"C:\Program Files\LibreOffice\program\soffice.exe" --version
+
+
+	4.	Modify file_converter.py if needed:
+Update this line:
+
+libreoffice_path = "soffice"
+
+To:
+
+libreoffice_path = "C:\\Program Files\\LibreOffice\\program\\soffice.exe"
+
 
 ### End important dependences ###
 
