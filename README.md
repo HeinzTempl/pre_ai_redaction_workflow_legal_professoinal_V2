@@ -24,13 +24,60 @@ Additionally, the solution provides an option to convert DOCX and MSG files to P
 
 ### Installation
 
-1. **Clone the Repository**  
+1. **Clone the Repository**  or just download the .py files as .zip folder and copy them into your python venv.
    Open your terminal or command prompt and run:
    ```bash
    [git clone https://github.com/yourusername/your-repository-name.git
    cd your-repository-name](https://github.com/HeinzTempl/pre_ai_redaction_workflow_legal_professoinal_V2.git)
 python -m venv venv
 source venv/bin/activate      # On Windows: venv\Scripts\activate
+
+### Important Dependences ###
+
+🔧 OpenSSL, Python, and Homebrew: Important Dependencies
+
+Some dependencies (such as urllib3) require an updated version of OpenSSL. If you encounter warnings or errors related to OpenSSL when running the script, follow these steps.
+
+🖥️ macOS (Homebrew)
+	1.	Ensure Homebrew is installed (if not, install it first):
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+
+	2.	Install or update OpenSSL:
+
+brew install openssl
+
+
+	3.	Add OpenSSL to your system path:
+
+echo 'export PATH="/usr/local/opt/openssl/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+
+	4.	If issues persist, reinstall Python via Homebrew:
+
+brew reinstall python
+
+🖥️ Windows
+
+If you encounter SSL errors when running the script, updating Python and OpenSSL may help.
+	1.	Download and install the latest Python version from python.org.
+	2.	Upgrade pip to ensure all dependencies install correctly:
+
+python -m pip install --upgrade pip
+
+
+	3.	If OpenSSL errors persist, install OpenSSL for Windows:
+	•	Download OpenSSL from slproweb.com.
+	•	Install it and add the installation path to the PATH environment variable.
+
+After these steps, your script should run without SSL issues. 🚀
+
+📌 If you want me to directly update your README.md, please re-upload the file!
+Otherwise, copy & paste this section into your existing file and push it to GitHub. 😊
+
+### End important dependences ###
 
 2.	Create a Virtual Environment (optional but recommended)
 python -m venv venv
@@ -41,6 +88,7 @@ Run the following commands in your terminal:
 pip install the following packages
 
 pip install python-docx
+pip install docx2pdf
 pip install spacy
 pip install pymupdf
 pip install openai
