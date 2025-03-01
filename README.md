@@ -84,7 +84,7 @@ After these steps, your script should run without SSL issues. 🚀
 Your previously uploaded README.md file has expired. Please re-upload it if you want me to modify it directly.
 
 🛠 LibreOffice Dependency for DOCX to PDF Conversion
-### The script can be adapted to use MS Word as a converter - libreoffice is free so you can use it anyway ###
+- The script can be adapted to use MS Word as a converter - libreoffice is free so you can use it anyway
 
 To convert .docx files to .pdf, this project uses LibreOffice in headless mode. Ensure it is installed and correctly configured on your system.
 
