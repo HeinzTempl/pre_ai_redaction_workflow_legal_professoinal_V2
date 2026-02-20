@@ -51,39 +51,95 @@ def convert_docx_to_pdf(input_file, output_file):
         print(f"❌ LibreOffice Fehler: {e}")
     except Exception as e:
         print(f"❌ Fehler bei der Umwandlung von DOCX zu PDF: {e}")
+def extract_msg_text(input_file):
+    """
+    Extrahiert den Text aus einer MSG-Datei und gibt ihn strukturiert zurück.
+    Gibt ein Dict zurück: {"sender": ..., "date": ..., "subject": ..., "body": ...}
+    """
+    import extract_msg
+    msg = extract_msg.Message(input_file)
+    return {
+        "sender": msg.sender or "",
+        "date": str(msg.date or ""),
+        "subject": msg.subject or "",
+        "body": msg.body or "",
+    }
+
+
+def convert_text_to_pdf(text_lines, output_file):
+    """
+    Erzeugt eine saubere PDF aus einer Liste von Textzeilen.
+    Unterstützt automatischen Seitenumbruch und UTF-8.
+    """
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    c = canvas.Canvas(output_file, pagesize=A4)
+    width, height = A4
+    margin_left = 50
+    margin_top = 50
+    margin_bottom = 50
+    line_height = 14
+    max_chars_per_line = 95  # Ungefähre Zeilenbreite
+
+    # Versuche eine UTF-8-fähige Schrift zu laden
+    font_name = "Helvetica"
+    font_size = 10
+
+    y = height - margin_top
+    c.setFont(font_name, font_size)
+
+    for line in text_lines:
+        # Lange Zeilen umbrechen
+        sublines = line.split("\n")
+        for subline in sublines:
+            # Manueller Zeilenumbruch bei langen Zeilen
+            while len(subline) > max_chars_per_line:
+                # Am letzten Leerzeichen vor dem Limit umbrechen
+                break_pos = subline.rfind(" ", 0, max_chars_per_line)
+                if break_pos == -1:
+                    break_pos = max_chars_per_line
+                chunk = subline[:break_pos]
+                subline = subline[break_pos:].lstrip()
+
+                if y < margin_bottom:
+                    c.showPage()
+                    c.setFont(font_name, font_size)
+                    y = height - margin_top
+
+                c.drawString(margin_left, y, chunk)
+                y -= line_height
+
+            # Restliche Zeile schreiben
+            if y < margin_bottom:
+                c.showPage()
+                c.setFont(font_name, font_size)
+                y = height - margin_top
+
+            c.drawString(margin_left, y, subline)
+            y -= line_height
+
+    c.showPage()
+    c.save()
+
+
 def convert_msg_to_pdf(input_file, output_file):
     """
-    Konvertiert eine MSG-Datei in eine PDF-Datei.
-    Hier wird die Konvertierung mit extract_msg und ReportLab durchgeführt.
+    Konvertiert eine MSG-Datei direkt in eine PDF-Datei (ohne Schwärzung).
+    Wird nur noch als Fallback verwendet.
     """
     try:
-        # Wir importieren hier lokal, damit diese Funktion unabhängig funktioniert.
-        import extract_msg
-        from reportlab.pdfgen import canvas
-        from reportlab.lib.pagesizes import letter
-
-        msg = extract_msg.Message(input_file)
-        msg_sender = msg.sender
-        msg_date = msg.date
-        msg_subject = msg.subject
-        msg_body = msg.body
-
-        c = canvas.Canvas(output_file, pagesize=letter)
-        width, height = letter
-        textobject = c.beginText(40, height - 40)
+        msg_data = extract_msg_text(input_file)
         lines = [
-            f"Subject: {msg_subject}",
-            f"From: {msg_sender}",
-            f"Date: {msg_date}",
+            f"Betreff: {msg_data['subject']}",
+            f"Von: {msg_data['sender']}",
+            f"Datum: {msg_data['date']}",
             "",
-            msg_body
+            msg_data["body"]
         ]
-        for line in lines:
-            for subline in line.split("\n"):
-                textobject.textLine(subline)
-        c.drawText(textobject)
-        c.showPage()
-        c.save()
+        convert_text_to_pdf(lines, output_file)
         print(f"[MSG -> PDF] {input_file} konvertiert nach {output_file}")
     except Exception as e:
         print(f"Fehler beim Konvertieren von {input_file}: {e}")

@@ -1,206 +1,140 @@
-# DSGVO/GDPR-Compliant Pre-AI Document Redaction Workflow V2
+# DSGVO/GDPR-Compliant Pre-AI Document Redaction Workflow V3
 
-## changelog for this Version 2: ##
-- improved Open AI-API Integration,
-- doc and docx files can be processed,
-- doc and docx file redaction now inclueds tables, page header and footers,
-- pre- and post llm redaction processing abailabel in workflow. 
+A privacy-first document redaction tool for legal professionals. Built to anonymize sensitive data in legal documents **before** they are sent to any LLM or external service — ensuring full GDPR/DSGVO compliance.
 
-This project provides a pre-processing workflow for legal documents that ensures sensitive data is anonymized before being processed by a Language Model (LLM). Designed with the needs of lawyers, prosecutors, notaries, and legal departments in mind, the solution helps you maintain GDPR compliance by ensuring that only anonymized data is sent to external LLM providers.
+> **Note:** The NER models used (Flair `ner-german-legal` + `ner-german-large`) are optimized for **German-language documents**. The tool interface is also in German.
 
-## Overview
+## What's New in V3
 
-The workflow processes various document formats (DOCX, PDF, MSG) using a two-step approach:
-1. **Regex-based Redaction:**  
-   Standardized patterns (e.g., email addresses, phone numbers) are replaced with placeholder text.
-2. **spaCy-based Redaction:**  
-   Advanced NLP (using spaCy) detects complex entities such as person names and organizations, replacing them with placeholders like "Person A" or "Firma A".
+- **Flair NER Integration** — Replaced spaCy with two stacked Flair models (`ner-german-legal` + `ner-german-large`) for significantly improved entity recognition in German legal texts
+- **Streamlit Web Frontend** — Full browser-based UI (`app.py`) with drag & drop upload, real-time progress, and download buttons — replaces the terminal workflow
+- **Three Sensitivity Levels** — *Konservativ* (aggressive), *Standard*, and *Liberal* (permissive) to control how much gets redacted
+- **Learning Layer** — Persistent correction system: mark entities as "never redact" or "always redact", corrections are saved across sessions
+- **Improved MSG Handling** — MSG files are now processed via text extraction → NER redaction → PDF generation (instead of primitive MSG→PDF→redact)
+- **Juristic Person Handling** — Organizations (juristische Personen) are preserved at *Konservativ* sensitivity, since they have no personal data protection rights
+- **Grundbuch Fraction Protection** — Land registry fractions (e.g. `128/542`) are detected and preserved during redaction
+- **Whitelist System** — Customizable whitelist of terms that should never be redacted (e.g. court names, authorities)
 
-Additionally, the solution provides an option to convert DOCX and MSG files to PDF for better processing accuracy. For cases where API-based redaction is required, an OpenAI API integration is available (with a GDPR-compliant data processing addendum).
+## How It Works
+
+The tool processes documents through a multi-stage pipeline:
+
+1. **Regex-based Redaction** — Detects standardized patterns (emails, phone numbers, IBANs, dates, addresses) and replaces them with placeholders
+2. **Flair NER Redaction** — Two stacked German NER models identify persons, organizations, and locations with confidence scoring
+3. **Learning Layer** — Applies persistent user corrections (always/never redact specific terms)
+4. **Optional OpenAI API** — For additional LLM-based redaction with a GDPR-compliant data processing addendum
+
+Supported file formats: **PDF**, **DOCX**, **DOC**, **MSG**
+
+## Architecture
+
+| File | Purpose |
+|------|---------|
+| `app.py` | Streamlit web frontend (recommended) |
+| `main.py` | Terminal-based interface (legacy) |
+| `docx_redactor.py` | Core NER engine, regex redaction, learning layer, entity mapping |
+| `pdf_redactor.py` | PDF-specific redaction with PyMuPDF |
+| `file_converter.py` | DOC→DOCX, MSG text extraction, text→PDF conversion |
+| `llm_api.py` | OpenAI API integration |
+| `requirements.txt` | Python dependencies |
 
 ## Getting Started
-### if you're getting some errors during installation or running the script - just copy/paste the error into ChatGPT and it can resolve most issues for you ###
 
 ### Prerequisites
 
-- **Python 3.7+**  
-  Download and install Python from: https://www.python.org/downloads/
-
-- **An IDE or Code Editor**  
-  We recommend using [PyCharm](https://www.jetbrains.com/pycharm/) or Visual Studio Code for an optimal development experience.
+- **Python 3.10+** — Download from [python.org](https://www.python.org/downloads/)
+- **LibreOffice** — Required for DOC→DOCX and DOCX→PDF conversion (headless mode)
+- ~4 GB RAM available (Flair models require ~1-2 GB idle, ~4 GB under load)
 
 ### Installation
 
-1. **Clone the Repository**  or just download the .py files as .zip folder and copy them into your python venv.
-   Open your terminal or command prompt and run:
+1. **Clone the repository**
    ```bash
-   [git clone https://github.com/yourusername/your-repository-name.git
-   cd your-repository-name](https://github.com/HeinzTempl/pre_ai_redaction_workflow_legal_professoinal_V2.git)
-python -m venv venv
-source venv/bin/activate      # On Windows: venv\Scripts\activate
+   git clone https://github.com/HeinzTempl/pre_ai_redaction_workflow_legal_professoinal_V2.git
+   cd pre_ai_redaction_workflow_legal_professoinal_V2
+   ```
 
-## !!! Important Dependences - Windows and Mac OS !!! ##
+2. **Create a virtual environment**
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate      # On Windows: .venv\Scripts\activate
+   ```
 
-🔧 OpenSSL, Python, and Homebrew: Important Dependencies
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Some dependencies (such as urllib3) require an updated version of OpenSSL. If you encounter warnings or errors related to OpenSSL when running the script, follow these steps.
+4. **Download Flair models** (automatic on first run, ~500 MB total)
 
-🖥️ macOS (Homebrew)
-	1.	Ensure Homebrew is installed (if not, install it first for installation refere to this site: https://brew.sh):
+   The models `flair/ner-german-legal` and `flair/ner-german-large` will be downloaded automatically to `~/.flair/` on first use.
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+5. **Install LibreOffice** (for DOC/DOCX conversion)
 
+   macOS:
+   ```bash
+   brew install --cask libreoffice
+   ```
+   Windows: Download from [libreoffice.org](https://www.libreoffice.org/download/)
 
-	2.	Install or update OpenSSL:
+   If `soffice` is not in your PATH, update the path in `file_converter.py`:
+   ```python
+   # macOS
+   libreoffice_path = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+   # Windows
+   libreoffice_path = "C:\\Program Files\\LibreOffice\\program\\soffice.exe"
+   ```
 
-brew install openssl
+### Usage
 
+**Web Frontend (recommended):**
+```bash
+streamlit run app.py
+```
+Opens automatically at `http://localhost:8501`. Upload files via drag & drop, select sensitivity level, and download redacted results.
 
-	3.	Add OpenSSL to your system path:
-
-echo 'export PATH="/usr/local/opt/openssl/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-
-
-	4.	If issues persist, reinstall Python via Homebrew:
-
-brew reinstall python
-
-🖥️ Windows
-
-If you encounter SSL errors when running the script, updating Python and OpenSSL may help.
-	1.	Download and install the latest Python version from python.org.
-	2.	Upgrade pip to ensure all dependencies install correctly:
-
-python -m pip install --upgrade pip
-
-
-	3.	If OpenSSL errors persist, install OpenSSL for Windows:
-	•	Download OpenSSL from slproweb.com.
-	•	Install it and add the installation path to the PATH environment variable.
-
-After these steps, your script should run without SSL issues. 🚀
-
-Your previously uploaded README.md file has expired. Please re-upload it if you want me to modify it directly.
-
-🛠 LibreOffice Dependency for DOCX to PDF Conversion
-- The script can be adapted to use MS Word as a converter - libreoffice is free so you can use it anyway
-
-To convert .docx files to .pdf, this project uses LibreOffice in headless mode. Ensure it is installed and correctly configured on your system.
-
-🖥️ macOS Installation
-	1.	Check if LibreOffice is installed:
-Run the following command in the terminal:
-
-which soffice
-
-If nothing is returned, LibreOffice is missing.
-
-	2.	Install LibreOffice via Homebrew:
-
-brew install --cask libreoffice
-
-
-	3.	Verify installation:
-
-/Applications/LibreOffice.app/Contents/MacOS/soffice --version
-
-If it works, update the script to explicitly use this path.
-
-	4.	Modify file_converter.py if needed:
-Locate this line:
-
-libreoffice_path = "soffice"
-
-Change it to:
-
-libreoffice_path = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
-
-🖥️ Windows Installation
-	1.	Check if LibreOffice is installed:
-Open cmd and run:
-
-where soffice
-
-If nothing appears, LibreOffice is missing.
-
-	2.	Download and install LibreOffice from the official website.
-	3.	Find the soffice.exe path:
-Default location:
-
-C:\Program Files\LibreOffice\program\soffice.exe
-
-Run the following command in cmd to verify:
-
-"C:\Program Files\LibreOffice\program\soffice.exe" --version
-
-
-	4.	Modify file_converter.py if needed:
-Update this line:
-
-libreoffice_path = "soffice"
-
-To:
-
-libreoffice_path = "C:\\Program Files\\LibreOffice\\program\\soffice.exe"
-
-
-### End important dependences ###
-
-2.	Create a Virtual Environment (optional but recommended)
-python -m venv venv
-source venv/bin/activate      # On Windows: venv\Scripts\activate
-
-3.	Install Dependencies
-Run the following commands in your terminal:
-pip install the following packages
-
-pip install python-docx
-pip install docx2pdf
-pip install spacy
-pip install pymupdf
-pip install openai
-pip install regex
-pip install unoconv
-pip install reportlab
-pip install extract-msg
-
-Install the SpaCy libraries for German
-SpaCy Lib:
-
-python -m spacy download de_core_news_sm
-
-
-5. 	Usage
-	1.	Configure Your Environment
-	•	Ensure that Microsoft Word (or an Office suite) is installed on your system if you plan to convert DOCX files to PDF.
-	•	If you use the API-based redaction option, make sure you have set your OpenAI API key (either by setting the OPENAI_API_KEY environment variable or directly in the code).
-	2.	Run the Script
-
-To start the workflow, simply run:
-
+**Terminal Interface:**
+```bash
 python main.py
+```
+Follow the interactive prompts to select a folder and processing options.
 
-The script will prompt you for a folder path and ask if you want to convert DOCX and MSG files to PDF. Based on your selection, it will process the files accordingly:
-	•	Option ‘j’ (yes): DOCX and MSG files are converted to PDF, then all PDFs are redacted.
-	•	Option ‘n’ (no): Existing PDFs are redacted, and DOCX files are processed directly (MSG files are still converted to PDF for redaction).
+### Output
 
-	3.	Output
+Redacted files are saved in a `redacted` subfolder inside the input folder. Converted files (if applicable) are saved in a `converted` subfolder.
 
-The redacted files are saved in a subfolder named redacted inside the input folder. Converted files (if applicable) are saved in a subfolder named converted.
+## Sensitivity Levels
 
-Additional Information
-	•	Local Redaction:
-Uses a hybrid approach with regex and spaCy for anonymizing personal data, ensuring that sensitive information is not exposed during subsequent LLM processing.
-	•	API Redaction:
-An alternative integration with OpenAI’s API is available. This method complies with GDPR as it uses a Data Processing Addendum. More details can be found here: https://openai.com/policies/data-processing-addendum/.
-	•	Network Paths:
-The script supports both local and network paths, as long as the network drive is properly mounted and accessible.
+| Level | Behavior |
+|-------|----------|
+| **Konservativ** | Maximum redaction. All detected entities redacted. Organizations (juristische Personen) are **preserved**. |
+| **Standard** | Balanced. High-confidence entities redacted, borderline cases skipped. |
+| **Liberal** | Minimal. Only very high-confidence detections are redacted. |
 
-License
+## Learning Layer
 
-[MIT License]
+The tool learns from your corrections:
 
-Contact
+- **"Nie schwärzen"** (Never redact) — Click on any redacted entity to whitelist it permanently
+- **"Doch schwärzen"** (Do redact) — Click on any skipped/whitelisted entity to force-redact it
+- **Manual entries** — Add custom terms via the sidebar form
 
-For any questions or feedback, please contact Heinz Templ, Attorney at law, at [heinz@templ.com].
+Corrections persist in `learned_entities.json` and are applied automatically in all future sessions.
+
+## Optional: OpenAI API Integration
+
+For additional LLM-based redaction, set your API key:
+```bash
+export OPENAI_API_KEY="sk-..."
+```
+Enable the API option in the sidebar. This sends **already-redacted** text to the API for a second pass — the original sensitive data never leaves your machine.
+
+OpenAI's GDPR-compliant Data Processing Addendum applies: [openai.com/policies/data-processing-addendum](https://openai.com/policies/data-processing-addendum/)
+
+## License
+
+[MIT License](LICENSE)
+
+## Contact
+
+Heinz Templ, Attorney at Law — [heinz@templ.com](mailto:heinz@templ.com)

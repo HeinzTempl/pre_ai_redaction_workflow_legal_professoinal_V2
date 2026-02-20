@@ -6,3 +6,7 @@ regex
 unoconv
 reportlab
 extract-msg
+flair
+torch
+docx2pdf
+streamlit

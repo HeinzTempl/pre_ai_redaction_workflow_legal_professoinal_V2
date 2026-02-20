@@ -1,0 +1,26 @@
+# Virtual environment
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Runtime data
+learned_entities.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Flair models (downloaded at runtime)
+.flair/
