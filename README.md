@@ -11,8 +11,7 @@ A privacy-first document redaction tool for legal professionals. Built to anonym
 - **Three Sensitivity Levels** — *Konservativ* (aggressive), *Standard*, and *Liberal* (permissive) to control how much gets redacted
 - **Learning Layer** — Persistent correction system: mark entities as "never redact" or "always redact", corrections are saved across sessions
 - **Improved MSG Handling** — MSG files are now processed via text extraction → NER redaction → PDF generation (instead of primitive MSG→PDF→redact)
-- **Juristic Person Handling** — Organizations (juristische Personen) are preserved at *Konservativ* sensitivity, since they have no personal data protection rights
-- **Grundbuch Fraction Protection** — Land registry fractions (e.g. `128/542`) are detected and preserved during redaction
+- **Juristic Person Handling** — Organizations (juristische Personen) are preserved at *Konservativ* sensitivity, since they are not covered by DSGVO/GDPR
 - **Whitelist System** — Customizable whitelist of terms that should never be redacted (e.g. court names, authorities)
 
 ## How It Works
